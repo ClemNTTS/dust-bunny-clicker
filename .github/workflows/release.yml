@@ -2,7 +2,7 @@ name: CI/CD Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-android:
@@ -31,13 +31,17 @@ jobs:
       - name: Prebuild (Generate Native Android)
         run: npx expo prebuild --platform android --no-install
 
+      - name: Debug Settings Gradle
+        run: cat android/settings.gradle
+
       - name: Build Android Release APK
         run: |
           cd android
           chmod +x gradlew
+          export NODE_BINARY=$(which node)
           ./gradlew assembleRelease --no-daemon
         env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: '--max-old-space-size=4096'
 
       - name: Get Version from package.json
         id: package-version
