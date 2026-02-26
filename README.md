@@ -58,11 +58,14 @@ Built with **React Native (Expo)**, **TypeScript**, and **Reanimated**.
 
 ## 🛠 CI/CD & Deployment
 
-This project uses **GitHub Actions** for CI. For production builds, we recommend using **Expo Application Services (EAS)**:
+This project uses **GitHub Actions** for CI.
 
-- Install EAS CLI: `npm install -g eas-cli`
-- Build for Android: `eas build -p android`
-- Build for iOS: `eas build -p ios`
+- **Continuous Integration:** Every push to `main` triggers linting, type-checking, and tests.
+- **Continuous Deployment:** Every push to `main` automatically builds an Android APK and creates a new **GitHub Release**.
+
+### Download APK
+
+You can find the latest build in the [Releases](https://github.com/ClemNTTS/dust-bunny-clicker/releases) section. Download `app-release.apk` and install it on your Android device.
 
 ---
 

@@ -44,66 +44,66 @@ export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 20,
-    marginTop: 40,
-  },
-  content: {
-    padding: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  itemInfo: {
-    flex: 1,
-  },
-  itemName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  itemDesc: {
-    fontSize: 14,
-    color: '#999',
-  },
-  itemBuy: {
-    alignItems: 'flex-end',
-  },
-  itemCount: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#666',
-  },
-  itemCost: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   canAfford: {
     color: '#4CAF50',
   },
   cannotAfford: {
     color: '#F44336',
+  },
+  container: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    elevation: 20,
+    flex: 1,
+    marginTop: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  content: {
+    padding: 30,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  item: {
+    alignItems: 'center',
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+  },
+  itemBuy: {
+    alignItems: 'flex-end',
+  },
+  itemCost: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemCount: {
+    color: '#666',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  itemDesc: {
+    color: '#999',
+    fontSize: 14,
+  },
+  itemInfo: {
+    flex: 1,
+  },
+  itemName: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  title: {
+    color: '#333',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
