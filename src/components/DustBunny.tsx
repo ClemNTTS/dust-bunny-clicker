@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Text, Dimensions } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,6 +9,8 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface DustBunnyProps {
   onPress: () => number;
@@ -27,12 +29,15 @@ export const DustBunny: React.FC<DustBunnyProps> = ({ onPress, size, color }) =>
   const scale = useSharedValue(1);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
+  // On limite la taille pour qu'elle ne dépasse jamais 80% de la largeur de l'écran
+  const responsiveSize = Math.min(size, SCREEN_WIDTH * 0.8);
+
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: color,
-    borderRadius: size / 2,
-    height: size,
+    borderRadius: responsiveSize / 2,
+    height: responsiveSize,
     transform: [{ scale: scale.value }],
-    width: size,
+    width: responsiveSize,
   }));
 
   const removeText = (id: number) => {
@@ -41,26 +46,23 @@ export const DustBunny: React.FC<DustBunnyProps> = ({ onPress, size, color }) =>
 
   const handlePress = (event: any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
     scale.value = withSequence(withTiming(0.85, { duration: 50 }), withSpring(1));
 
     const power = onPress();
-
-    // Add floating text
     const { locationX, locationY } = event.nativeEvent;
     const id = Date.now();
     setFloatingTexts((prev) => [...prev, { id, value: power, x: locationX, y: locationY }]);
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={handlePress} style={styles.touchArea}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <TouchableOpacity activeOpacity={1} onPress={handlePress} style={styles.touchArea}>
         <Animated.View style={[styles.bunny, animatedStyle]} />
-        {floatingTexts.map((text) => (
-          <FloatingNumber key={text.id} text={text} onComplete={() => removeText(text.id)} />
-        ))}
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+      {floatingTexts.map((text) => (
+        <FloatingNumber key={text.id} text={text} onComplete={() => removeText(text.id)} />
+      ))}
+    </View>
   );
 };
 
@@ -69,8 +71,8 @@ const FloatingNumber = ({ text, onComplete }: { text: FloatingText; onComplete: 
   const opacity = useSharedValue(1);
 
   React.useEffect(() => {
-    translateY.value = withTiming(-100, { duration: 1000 });
-    opacity.value = withTiming(0, { duration: 1000 }, (finished) => {
+    translateY.value = withTiming(-120, { duration: 800 });
+    opacity.value = withTiming(0, { duration: 800 }, (finished) => {
       if (finished) runOnJS(onComplete)();
     });
   }, []);
@@ -79,12 +81,12 @@ const FloatingNumber = ({ text, onComplete }: { text: FloatingText; onComplete: 
     left: text.x,
     opacity: opacity.value,
     position: 'absolute',
-    top: text.y,
+    top: text.y - 50,
     transform: [{ translateY: translateY.value }],
   }));
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={animatedStyle} pointerEvents="none">
       <Text style={styles.floatingText}>+{text.value}</Text>
     </Animated.View>
   );
@@ -100,18 +102,20 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    height: 400,
+    flex: 1,
     justifyContent: 'center',
     width: '100%',
   },
   floatingText: {
     color: '#38BDF8',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
   },
   touchArea: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
   },
 });

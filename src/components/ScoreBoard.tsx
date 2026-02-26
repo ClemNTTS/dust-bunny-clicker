@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { THEME } from '../constants/game';
 import { GameState } from '../hooks/useGameState';
@@ -10,25 +10,39 @@ interface ScoreBoardProps {
   levelName: string;
   progress: number;
   pps: number;
+  absurdFact: string;
 }
 
-export const ScoreBoard: React.FC<ScoreBoardProps> = ({ state, levelName, progress, pps }) => {
+export const ScoreBoard: React.FC<ScoreBoardProps> = ({
+  state,
+  levelName,
+  progress,
+  pps,
+  absurdFact,
+}) => {
   const animatedProgressStyle = useAnimatedStyle(() => ({
     width: `${progress * 100}%`,
   }));
 
   return (
     <View style={styles.container}>
-      <Text style={styles.particles}>{Math.floor(state.particles).toLocaleString()}</Text>
-      <Text style={styles.label}>Dust Particles</Text>
+      <View style={styles.header}>
+        <Text style={styles.particles}>{Math.floor(state.particles).toLocaleString()}</Text>
+        <Text style={styles.label}>Dust Particles</Text>
+      </View>
 
       <View style={styles.statsRow}>
         <Text style={styles.pps}>{pps.toLocaleString()} / sec</Text>
+        {state.prestigeLevel > 0 && (
+          <Text style={styles.prestige}>Mult: x{state.prestigeLevel + 1}</Text>
+        )}
       </View>
+
+      <Text style={styles.absurdFact}>{absurdFact}</Text>
 
       <View style={styles.levelContainer}>
         <View style={styles.levelHeader}>
-          <Text style={styles.levelLabel}>Current Level</Text>
+          <Text style={styles.levelLabel}>Rank</Text>
           <Text style={styles.levelName}>{levelName}</Text>
         </View>
         <View style={styles.progressBarBg}>
@@ -40,10 +54,21 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({ state, levelName, progre
 };
 
 const styles = StyleSheet.create({
+  absurdFact: {
+    color: THEME.textMuted,
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginTop: 8,
+    textAlign: 'center',
+  },
   container: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
     padding: 20,
+    zIndex: 10,
+  },
+  header: {
+    alignItems: 'center',
   },
   label: {
     color: THEME.textMuted,
@@ -53,13 +78,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   levelContainer: {
-    marginTop: 20,
+    marginTop: 15,
     width: '100%',
   },
   levelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   levelLabel: {
     color: THEME.textMuted,
@@ -72,7 +97,7 @@ const styles = StyleSheet.create({
   },
   particles: {
     color: THEME.text,
-    fontSize: 56,
+    fontSize: 48,
     fontWeight: '900',
   },
   pps: {
@@ -80,10 +105,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  prestige: {
+    color: THEME.accent,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 15,
+  },
   progressBarBg: {
     backgroundColor: '#334155',
     borderRadius: 4,
-    height: 8,
+    height: 6,
     overflow: 'hidden',
     width: '100%',
   },
@@ -92,7 +123,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   statsRow: {
+    alignItems: 'center',
     flexDirection: 'row',
-    marginTop: 10,
+    marginTop: 5,
   },
 });

@@ -1,18 +1,39 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ScrollView, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ScrollView, View, Alert } from 'react-native';
 
 import { THEME, UPGRADES } from '../constants/game';
 import { GameState } from '../hooks/useGameState';
 
 interface ShopProps {
   onBuy: (id: string) => void;
+  onPrestige: () => void;
   state: GameState;
+  isMaxLevel: boolean;
 }
 
-export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
+export const Shop: React.FC<ShopProps> = ({ state, onBuy, onPrestige, isMaxLevel }) => {
+  const handlePrestige = () => {
+    Alert.alert(
+      'BIG BANG',
+      'Are you ready to collapse this universe? You will lose all particles and upgrades, but gain a permanent +100% power multiplier.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'DO IT', onPress: onPrestige, style: 'destructive' },
+      ],
+    );
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Cosmic Upgrades</Text>
+
+      {isMaxLevel && (
+        <TouchableOpacity style={styles.prestigeCard} onPress={handlePrestige}>
+          <Text style={styles.prestigeTitle}>✨ COLLAPSE UNIVERSE ✨</Text>
+          <Text style={styles.prestigeDesc}>Reset everything for permanent power!</Text>
+        </TouchableOpacity>
+      )}
+
       {UPGRADES.map((u) => {
         const count = state.upgrades[u.id] || 0;
         const cost = Math.floor(u.baseCost * Math.pow(1.15, count));
@@ -70,7 +91,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     elevation: 20,
-    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { height: -10, width: 0 },
     shadowOpacity: 0.5,
@@ -108,6 +128,24 @@ const styles = StyleSheet.create({
     color: THEME.textMuted,
     fontSize: 14,
     marginTop: 2,
+  },
+  prestigeCard: {
+    alignItems: 'center',
+    backgroundColor: THEME.accent,
+    borderRadius: 16,
+    marginBottom: 20,
+    padding: 20,
+  },
+  prestigeDesc: {
+    color: '#fff',
+    fontSize: 12,
+    marginTop: 4,
+    opacity: 0.9,
+  },
+  prestigeTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '900',
   },
   price: {
     fontSize: 16,

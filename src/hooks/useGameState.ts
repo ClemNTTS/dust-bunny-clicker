@@ -1,14 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 import { LEVELS, UPGRADES } from '../constants/game';
 
-const STORAGE_KEY = '@dust_bunny_save';
+const STORAGE_KEY = '@dust_bunny_save_v2';
 
 export interface GameState {
   particles: number;
   totalParticles: number;
   upgrades: Record<string, number>;
+  lastTimestamp: number;
+  prestigeLevel: number;
 }
 
 export const useGameState = () => {
@@ -16,16 +19,55 @@ export const useGameState = () => {
     particles: 0,
     totalParticles: 0,
     upgrades: {},
+    lastTimestamp: Date.now(),
+    prestigeLevel: 0,
   });
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load game
+  // Auto-clicker PPS calculation
+  const pps =
+    UPGRADES.filter((u) => u.type === 'auto').reduce(
+      (acc, u) => acc + (state.upgrades[u.id] || 0) * u.power,
+      0,
+    ) *
+    (1 + state.prestigeLevel);
+
+  // Load game and handle offline gains
   useEffect(() => {
     const loadGame = async () => {
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
-          setState(JSON.parse(saved));
+          const loadedState: GameState = JSON.parse(saved);
+          const now = Date.now();
+          const diffInSeconds = Math.floor((now - loadedState.lastTimestamp) / 1000);
+
+          // Recalculate PPS for the loaded state to be accurate
+          const loadedPPS =
+            UPGRADES.filter((u) => u.type === 'auto').reduce(
+              (acc, u) => acc + (loadedState.upgrades[u.id] || 0) * u.power,
+              0,
+            ) *
+            (1 + loadedState.prestigeLevel);
+
+          if (diffInSeconds > 60 && loadedPPS > 0) {
+            const offlineGains = diffInSeconds * loadedPPS;
+            const cappedGains = Math.min(offlineGains, loadedPPS * 3600 * 12); // Cap at 12 hours
+
+            Alert.alert(
+              'Welcome Back!',
+              `Your vortex collected ${Math.floor(cappedGains).toLocaleString()} particles while you were gone.`,
+            );
+
+            setState({
+              ...loadedState,
+              particles: loadedState.particles + cappedGains,
+              totalParticles: loadedState.totalParticles + cappedGains,
+              lastTimestamp: now,
+            });
+          } else {
+            setState({ ...loadedState, lastTimestamp: now });
+          }
         }
       } catch (e) {
         console.error('Failed to load game', e);
@@ -36,17 +78,21 @@ export const useGameState = () => {
     loadGame();
   }, []);
 
-  // Save game
+  // Save game periodically
   useEffect(() => {
     if (isLoaded) {
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const interval = setInterval(() => {
+        AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, lastTimestamp: Date.now() }));
+      }, 5000);
+      return () => clearInterval(interval);
     }
   }, [state, isLoaded]);
 
   const click = useCallback(() => {
     const brushPower = (state.upgrades['brush'] || 0) * 1;
     const magnetPower = (state.upgrades['magnet'] || 0) * 5;
-    const clickPower = 1 + brushPower + magnetPower;
+    const multiplier = 1 + state.prestigeLevel;
+    const clickPower = (1 + brushPower + magnetPower) * multiplier;
 
     setState((prev) => ({
       ...prev,
@@ -55,7 +101,7 @@ export const useGameState = () => {
     }));
 
     return clickPower;
-  }, [state.upgrades]);
+  }, [state.upgrades, state.prestigeLevel]);
 
   const buyUpgrade = useCallback((upgradeId: string) => {
     const upgrade = UPGRADES.find((u) => u.id === upgradeId);
@@ -79,6 +125,16 @@ export const useGameState = () => {
     });
   }, []);
 
+  const triggerPrestige = useCallback(() => {
+    setState((prev) => ({
+      particles: 0,
+      totalParticles: 0,
+      upgrades: {},
+      lastTimestamp: Date.now(),
+      prestigeLevel: prev.prestigeLevel + 1,
+    }));
+  }, []);
+
   // Auto-clicker loop
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,21 +146,18 @@ export const useGameState = () => {
 
         if (autoPower === 0) return prev;
 
+        const totalAutoPower = autoPower * (1 + prev.prestigeLevel);
+
         return {
           ...prev,
-          particles: prev.particles + autoPower,
-          totalParticles: prev.totalParticles + autoPower,
+          particles: prev.particles + totalAutoPower / 10, // Run 10 times per sec for smoothness
+          totalParticles: prev.totalParticles + totalAutoPower / 10,
         };
       });
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
-
-  const pps = UPGRADES.filter((u) => u.type === 'auto').reduce(
-    (acc, u) => acc + (state.upgrades[u.id] || 0) * u.power,
-    0,
-  );
 
   const levelIndex =
     LEVELS.slice()
@@ -125,6 +178,18 @@ export const useGameState = () => {
       (nextLevel.threshold - currentLevel.threshold)
     : 1;
 
+  // Absurd facts calculation
+  const getAbsurdFact = () => {
+    const total = state.totalParticles;
+    if (total < 1000) return 'Lighter than a whisper.';
+    if (total < 10000) return 'Heavier than a single snowflake.';
+    if (total < 100000) return 'Mass equivalent to a medium pizza.';
+    if (total < 1000000) return 'As dense as a small car.';
+    if (total < 10000000) return 'Weighs more than a Boeing 747.';
+    if (total < 100000000) return 'Heavier than the Great Pyramid of Giza.';
+    return 'Currently distorting local space-time.';
+  };
+
   return {
     buyUpgrade,
     click,
@@ -134,5 +199,7 @@ export const useGameState = () => {
     pps,
     progress,
     state,
+    absurdFact: getAbsurdFact(),
+    triggerPrestige,
   };
 };
