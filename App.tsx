@@ -14,13 +14,9 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <ScoreBoard state={state} levelName={currentLevel.name} />
-      
+
       <View style={styles.bunnyContainer}>
-        <DustBunny 
-          onPress={click} 
-          size={currentLevel.size} 
-          color={currentLevel.color} 
-        />
+        <DustBunny onPress={click} size={currentLevel.size} color={currentLevel.color} />
       </View>
 
       <Shop state={state} onBuy={buyUpgrade} />

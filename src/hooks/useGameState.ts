@@ -80,7 +80,7 @@ export const useGameState = () => {
     const interval = setInterval(() => {
       setState((prev) => {
         let autoPower = 0;
-        UPGRADES.filter(u => u.type === 'auto').forEach(u => {
+        UPGRADES.filter((u) => u.type === 'auto').forEach((u) => {
           autoPower += (prev.upgrades[u.id] || 0) * u.power;
         });
 
@@ -97,7 +97,10 @@ export const useGameState = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const currentLevel = LEVELS.slice().reverse().find(l => state.totalParticles >= l.threshold) || LEVELS[0];
+  const currentLevel =
+    LEVELS.slice()
+      .reverse()
+      .find((l) => state.totalParticles >= l.threshold) || LEVELS[0];
 
   return {
     state,

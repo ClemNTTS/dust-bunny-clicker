@@ -18,8 +18,8 @@ export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
         const canAfford = state.particles >= cost;
 
         return (
-          <TouchableOpacity 
-            key={u.id} 
+          <TouchableOpacity
+            key={u.id}
             onPress={() => onBuy(u.id)}
             disabled={!canAfford}
             style={[styles.item, !canAfford && styles.disabled]}
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: -10 },
     shadowOpacity: 0.1,
     shadowRadius: 10,

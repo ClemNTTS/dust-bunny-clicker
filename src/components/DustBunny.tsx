@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
-  withSequence, 
-  withTiming 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 
 interface DustBunnyProps {
@@ -28,10 +28,7 @@ export const DustBunny: React.FC<DustBunnyProps> = ({ onPress, size, color }) =>
   });
 
   const handlePress = () => {
-    scale.value = withSequence(
-      withTiming(0.9, { duration: 50 }),
-      withSpring(1)
-    );
+    scale.value = withSequence(withTiming(0.9, { duration: 50 }), withSpring(1));
     onPress();
   };
 
@@ -44,7 +41,7 @@ export const DustBunny: React.FC<DustBunnyProps> = ({ onPress, size, color }) =>
 
 const styles = StyleSheet.create({
   bunny: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
