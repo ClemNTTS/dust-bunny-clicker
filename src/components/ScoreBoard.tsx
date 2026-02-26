@@ -25,27 +25,27 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 20,
   },
-  particles: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: '#333',
-  },
   label: {
-    fontSize: 16,
     color: '#666',
+    fontSize: 16,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   levelBadge: {
-    marginTop: 10,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
     backgroundColor: '#333',
     borderRadius: 20,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   levelText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  particles: {
+    color: '#333',
+    fontSize: 48,
+    fontWeight: '800',
   },
 });

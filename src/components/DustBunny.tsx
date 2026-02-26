@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -41,10 +41,10 @@ export const DustBunny: React.FC<DustBunnyProps> = ({ onPress, size, color }) =>
 
 const styles = StyleSheet.create({
   bunny: {
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { height: 10, width: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
-    elevation: 10,
   },
 });

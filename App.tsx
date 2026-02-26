@@ -29,13 +29,13 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
   bunnyContainer: {
+    alignItems: 'center',
     flex: 1.2,
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  container: {
+    backgroundColor: '#F5F5F5',
+    flex: 1,
   },
 });
