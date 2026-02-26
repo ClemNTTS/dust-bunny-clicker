@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useState } from 'react';
+
 import { LEVELS, UPGRADES } from '../constants/game';
 
 const STORAGE_KEY = '@dust_bunny_save';
@@ -43,15 +44,18 @@ export const useGameState = () => {
   }, [state, isLoaded]);
 
   const click = useCallback(() => {
-    setState((prev) => {
-      const clickPower = 1 + (prev.upgrades['brush'] || 0) * 1;
-      return {
-        ...prev,
-        particles: prev.particles + clickPower,
-        totalParticles: prev.totalParticles + clickPower,
-      };
-    });
-  }, []);
+    const brushPower = (state.upgrades['brush'] || 0) * 1;
+    const magnetPower = (state.upgrades['magnet'] || 0) * 5;
+    const clickPower = 1 + brushPower + magnetPower;
+
+    setState((prev) => ({
+      ...prev,
+      particles: prev.particles + clickPower,
+      totalParticles: prev.totalParticles + clickPower,
+    }));
+
+    return clickPower;
+  }, [state.upgrades]);
 
   const buyUpgrade = useCallback((upgradeId: string) => {
     const upgrade = UPGRADES.find((u) => u.id === upgradeId);
@@ -97,16 +101,38 @@ export const useGameState = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const currentLevel =
+  const pps = UPGRADES.filter((u) => u.type === 'auto').reduce(
+    (acc, u) => acc + (state.upgrades[u.id] || 0) * u.power,
+    0,
+  );
+
+  const levelIndex =
     LEVELS.slice()
       .reverse()
-      .find((l) => state.totalParticles >= l.threshold) || LEVELS[0];
+      .findIndex((l) => state.totalParticles >= l.threshold) !== -1
+      ? LEVELS.length -
+        1 -
+        LEVELS.slice()
+          .reverse()
+          .findIndex((l) => state.totalParticles >= l.threshold)
+      : 0;
+
+  const currentLevel = LEVELS[levelIndex];
+  const nextLevel = LEVELS[levelIndex + 1];
+
+  const progress = nextLevel
+    ? (state.totalParticles - currentLevel.threshold) /
+      (nextLevel.threshold - currentLevel.threshold)
+    : 1;
 
   return {
-    state,
-    click,
     buyUpgrade,
+    click,
     currentLevel,
     isLoaded,
+    nextLevel,
+    pps,
+    progress,
+    state,
   };
 };

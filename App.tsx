@@ -2,27 +2,29 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useGameState } from './src/hooks/useGameState';
-import { ScoreBoard } from './src/components/ScoreBoard';
+
 import { DustBunny } from './src/components/DustBunny';
+import { ScoreBoard } from './src/components/ScoreBoard';
 import { Shop } from './src/components/Shop';
+import { THEME } from './src/constants/game';
+import { useGameState } from './src/hooks/useGameState';
 
 export default function App() {
-  const { state, click, buyUpgrade, currentLevel, isLoaded } = useGameState();
+  const { state, click, buyUpgrade, currentLevel, progress, pps, isLoaded } = useGameState();
 
   if (!isLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <ScoreBoard state={state} levelName={currentLevel.name} />
+        <StatusBar barStyle="light-content" />
+        <ScoreBoard pps={pps} state={state} progress={progress} levelName={currentLevel.name} />
 
         <View style={styles.bunnyContainer}>
-          <DustBunny onPress={click} size={currentLevel.size} color={currentLevel.color} />
+          <DustBunny color={currentLevel.color} onPress={click} size={currentLevel.size} />
         </View>
 
-        <Shop state={state} onBuy={buyUpgrade} />
+        <Shop onBuy={buyUpgrade} state={state} />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -35,7 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   container: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: THEME.background,
     flex: 1,
   },
 });

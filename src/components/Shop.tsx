@@ -1,17 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ScrollView, View } from 'react-native';
-import { UPGRADES } from '../constants/game';
+
+import { THEME, UPGRADES } from '../constants/game';
 import { GameState } from '../hooks/useGameState';
 
 interface ShopProps {
-  state: GameState;
   onBuy: (id: string) => void;
+  state: GameState;
 }
 
 export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Upgrades</Text>
+      <Text style={styles.title}>Cosmic Upgrades</Text>
       {UPGRADES.map((u) => {
         const count = state.upgrades[u.id] || 0;
         const cost = Math.floor(u.baseCost * Math.pow(1.15, count));
@@ -20,20 +21,26 @@ export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
         return (
           <TouchableOpacity
             key={u.id}
-            onPress={() => onBuy(u.id)}
             disabled={!canAfford}
-            style={[styles.item, !canAfford && styles.disabled]}
+            onPress={() => onBuy(u.id)}
+            style={[styles.card, !canAfford && styles.disabled]}
           >
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{u.name}</Text>
-              <Text style={styles.itemDesc}>
-                {u.type === 'manual' ? `+${u.power} per click` : `+${u.power} per sec`}
-              </Text>
+            <View style={styles.cardHeader}>
+              <View style={styles.info}>
+                <Text style={styles.name}>{u.name}</Text>
+                <Text style={styles.power}>
+                  {u.type === 'manual' ? `+${u.power} / click` : `+${u.power} / sec`}
+                </Text>
+              </View>
+              <View style={styles.countBadge}>
+                <Text style={styles.countText}>{count}</Text>
+              </View>
             </View>
-            <View style={styles.itemBuy}>
-              <Text style={styles.itemCount}>{count}</Text>
-              <Text style={[styles.itemCost, canAfford ? styles.canAfford : styles.cannotAfford]}>
-                {cost.toLocaleString()}
+            <View style={styles.priceRow}>
+              <Text
+                style={[styles.price, canAfford ? styles.priceAffordable : styles.priceExpensive]}
+              >
+                {cost.toLocaleString()} Particles
               </Text>
             </View>
           </TouchableOpacity>
@@ -44,66 +51,83 @@ export const Shop: React.FC<ShopProps> = ({ state, onBuy }) => {
 };
 
 const styles = StyleSheet.create({
-  canAfford: {
-    color: '#4CAF50',
+  card: {
+    backgroundColor: THEME.card,
+    borderRadius: 16,
+    marginBottom: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { height: 4, width: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
-  cannotAfford: {
-    color: '#F44336',
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   container: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: '#0F172A',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     elevation: 20,
-    flex: 1,
-    marginTop: 40,
+    marginTop: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowOffset: { height: -10, width: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
   },
   content: {
-    padding: 30,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  countBadge: {
+    alignItems: 'center',
+    backgroundColor: THEME.primary,
+    borderRadius: 12,
+    height: 24,
+    justifyContent: 'center',
+    width: 36,
+  },
+  countText: {
+    color: '#0F172A',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   disabled: {
     opacity: 0.5,
   },
-  item: {
-    alignItems: 'center',
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-  },
-  itemBuy: {
-    alignItems: 'flex-end',
-  },
-  itemCost: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  itemCount: {
-    color: '#666',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  itemDesc: {
-    color: '#999',
-    fontSize: 14,
-  },
-  itemInfo: {
+  info: {
     flex: 1,
   },
-  itemName: {
-    color: '#333',
+  name: {
+    color: THEME.text,
     fontSize: 18,
+    fontWeight: '700',
+  },
+  power: {
+    color: THEME.textMuted,
+    fontSize: 14,
+    marginTop: 2,
+  },
+  price: {
+    fontSize: 16,
     fontWeight: '600',
+    marginTop: 12,
+  },
+  priceAffordable: {
+    color: '#4ADE80',
+  },
+  priceExpensive: {
+    color: '#F87171',
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   title: {
-    color: '#333',
+    color: THEME.text,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '800',
     marginBottom: 20,
   },
 });
